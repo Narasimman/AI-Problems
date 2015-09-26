@@ -3,6 +3,7 @@ package PS1;
 public class State {
   private int taskId;
   private boolean visited;
+  private String sequence;
   
   public State(int id) {
     this.taskId = id;
@@ -13,12 +14,20 @@ public class State {
     return visited;
   }
   
-  public int getTask() {
+  public int getTaskId() {
     return taskId;
+  }
+  
+  public void setSequence(String s) {
+    this.sequence = s;
+  }
+  
+  public String getSequence() {
+    return this.sequence;
   }
   
   @Override
   public String toString() {
-    return "" + this.taskId;
+    return "" + this.sequence;
   }
 }
