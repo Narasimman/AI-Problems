@@ -17,7 +17,7 @@ public class MainDriver {
   public MainDriver() {
     Task start = new Task(-1, 0, 0);
 
-    try(Scanner scanner = new Scanner(new File("input1"));) {      
+    try(Scanner scanner = new Scanner(new File("input"));) {      
       int numberOfTasks = scanner.nextInt();
       int targetValue = scanner.nextInt();
       int targetDeadline = scanner.nextInt();
@@ -51,7 +51,9 @@ public class MainDriver {
 
   void run() {
     search.doBFS();
+    search.displayResult();
     search.doIterativeDeepening();
+    search.displayResult();
   }
 
   /**
