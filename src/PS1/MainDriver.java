@@ -23,7 +23,7 @@ public class MainDriver {
   private DirectedGraph<Task, DefaultEdge> graph;
   private StateSpaceSearch search;
   private static Statistics stats = new Statistics();
-  
+
   /**
    * Constructor
    * @param inputFile
@@ -55,7 +55,7 @@ public class MainDriver {
 
       DependencyGraph g = new DependencyGraph();      
       graph = g.createDependencyGraph(taskList, dep);
-      
+
       search = new StateSpaceSearch(taskList, graph);      
       search.initialize(start, goal, maxFrontierSize);
       scanner.close();
@@ -71,7 +71,7 @@ public class MainDriver {
     search.doBFS();
     stats.addToList(search.getStat());
   }
-  
+
   /**
    * Display the statistics collected
    */
@@ -92,6 +92,48 @@ public class MainDriver {
   }
 
   /**
+   * Construct a random DAG using the algorithm provided in the problem
+   * @param N
+   * @return
+   */
+  private static String generateRandomDAG(int N) {
+    StringBuffer sb = new StringBuffer();
+
+    Long rangeFrom = Math.round(Math.pow(N, 2) * (1 - (2/Math.sqrt(N)))/4);
+    Long rangeTo = Math.round(Math.pow(N, 2) * (1 + (2/Math.sqrt(N)))/4);
+
+    Random r = new Random();
+    int targetValue = r.nextInt(rangeTo.intValue() - 
+        rangeFrom.intValue()) + rangeFrom.intValue();
+    int targetDeadline = r.nextInt(rangeTo.intValue() - 
+        rangeFrom.intValue()) + rangeFrom.intValue();
+    int maxFrontier = r.nextInt(N - 3) + 3;
+
+    sb.append(N + " " + targetValue + " " + 
+        targetDeadline + " " + maxFrontier + "\n");
+    List<Integer> P = new ArrayList<Integer>();
+    Random r1 = new Random(N);
+    for (int i = 0; i < N; i++) {
+      int value = r1.nextInt(N-1) + 1;
+      int time = r1.nextInt(N-1) + 1;
+      P.add(i + 1);
+      sb.append(i + " " + value + " " + time + "\n");      
+    }
+
+    /* Construct a random permutation */
+    Collections.shuffle(P, r1);
+
+    for (int I=0; I < N-1; I++) {
+      for (int J = I+1; J < N; J++) {
+        if(r1.nextInt(100) <= 20) {
+          sb.append((P.get(I) -1 ) + " " + (P.get(J) - 1) + "\n");
+        }
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * @param args
    */
   public static void main(String[] args) {
@@ -99,46 +141,18 @@ public class MainDriver {
     int E = Integer.parseInt(args[1]);
     String inputFile = "input2";
     PrintWriter out = null;
-
+    String input;
     for (int k = 0; k < E; k++) {
+      input = MainDriver.generateRandomDAG(N);
       try {
         out = new PrintWriter(inputFile);
+        out.write(input);        
       } catch (FileNotFoundException e) {
         System.out.println("Problem in generating input file");
-      }
-      StringBuffer sb = new StringBuffer();
-
-      Long rangeFrom = Math.round(Math.pow(N, 2) * (1 - (2/Math.sqrt(N)))/4);
-      Long rangeTo = Math.round(Math.pow(N, 2) * (1 + (2/Math.sqrt(N)))/4);
-
-      Random r = new Random();
-      int targetValue = r.nextInt(rangeTo.intValue() - rangeFrom.intValue()) + rangeFrom.intValue();
-      int targetDeadline = r.nextInt(rangeTo.intValue() - rangeFrom.intValue()) + rangeFrom.intValue();
-      int maxFrontier = r.nextInt(N - 3) + 3;
-
-      sb.append(N + " " + targetValue + " " + targetDeadline + " " + maxFrontier + "\n");
-      List<Integer> P = new ArrayList<Integer>();
-      Random r1 = new Random(N);
-      for (int i = 0; i < N; i++) {
-        int value = r1.nextInt(N-1) + 1;
-        int time = r1.nextInt(N-1) + 1;
-        P.add(i + 1);
-        sb.append(i + " " + value + " " + time + "\n");      
+      } finally {      
+        out.close();
       }
 
-      /* Construct a random permutation */
-      Collections.shuffle(P, r1);
-
-      for (int I=0; I < N-1; I++) {
-        for (int J = I+1; J < N; J++) {
-          if(r1.nextInt(100) <= 20) {
-            sb.append((P.get(I) -1 ) + " " + (P.get(J) - 1) + "\n");
-          }
-        }
-      }
-      out.write(sb.toString());
-      out.close();
-      
       MainDriver driver = new MainDriver(inputFile);
       driver.run();
     }

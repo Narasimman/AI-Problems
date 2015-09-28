@@ -130,10 +130,8 @@ public class StateSpaceSearch {
     while (!fringe.isEmpty())
     {
       State parent = fringe.pop();
-      //System.out.println("Node Visited " + parent.getSequence());
 
-      if (this.isGoalReached(parent))
-      {
+      if (this.isGoalReached(parent)) {
         proceed = true;
         break;
       }
