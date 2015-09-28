@@ -6,6 +6,7 @@ package PS1;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
  * @author Narasimman
@@ -164,6 +164,7 @@ public class StateSpaceSearch {
     
     if(map.get("value") >= this.goal.getValue() && map.get("time") <= this.goal.getTime()) {
       this.resultTask = new Task(-1, map.get("value"), map.get("time"));
+      System.out.println("States size : " + searchMap.size());
       return true;
     }
     
@@ -173,12 +174,11 @@ public class StateSpaceSearch {
   private void constructSpaceSearchTree() {
     Queue<State> stateQueue = new LinkedList<State>();
     stateSpaceTree.addVertex(root);
-    TopologicalOrderIterator<Task, DefaultEdge> orderIterator;
-    orderIterator = new TopologicalOrderIterator<Task, DefaultEdge>(g);
-
+    
+    Iterator<Task> iterator = taskList.iterator();
     //Adding initial tasks that are with no pre-req
-    while(orderIterator.hasNext()) {
-      Task task = orderIterator.next();
+    while(iterator.hasNext()) {
+      Task task = iterator.next();
       if(g.inDegreeOf(task) < 1) {
         State s = new State(this.stateCounter + 1, task.getId(), root.getDepth() + 1);
         s.setSequence(Integer.toString(task.getId()));
@@ -187,15 +187,19 @@ public class StateSpaceSearch {
         stateQueue.add(s);
       }
     }
-
+    
     while(!stateQueue.isEmpty()) {
       State currentState = stateQueue.poll();
-      orderIterator =
-          new TopologicalOrderIterator<Task, DefaultEdge>(g);      
-      while(orderIterator.hasNext()) {
-        Task task = orderIterator.next();
-        int indegree = g.inDegreeOf(task);
+      iterator = taskList.iterator();
+      
+      while(iterator.hasNext()) {
         String currentSequence = currentState.getSequence();
+        Task task = iterator.next();
+        if(currentSequence.contains(Integer.toString(task.getId()))) {
+          continue;
+        }
+        
+        int indegree = g.inDegreeOf(task);        
         int sequenceLength = currentSequence.length();
         int taskId = task.getId();
         String sTaskId = Integer.toString(taskId);
@@ -226,6 +230,7 @@ public class StateSpaceSearch {
     }
 
     System.out.println(stateSpaceTree);
+    System.out.println("Tree size = " + stateSpaceTree.vertexSet().size());
   }
     
   /**
