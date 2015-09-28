@@ -37,16 +37,13 @@ public class StateSpaceSearch {
   public StateSpaceSearch(List<Task> list, DirectedGraph<Task, DefaultEdge> g) {
     this.taskList = list;
     this.g = g;
-    this.goalFound = false;
-    
+    this.goalFound = false;    
   }
 
   public void initialize(Task s, Task g) {
     this.start = s;
     this.goal = g;
-
     this.root = new State(start.getId(), 0);
-
     constructSpaceSearchTree();
   }
 
@@ -58,6 +55,7 @@ public class StateSpaceSearch {
       System.out.println("0");
     }
   }
+
   void doBFS() {
     List<State> children = new ArrayList<State>();
     Queue<State> fringe = new LinkedList<State>();
@@ -125,8 +123,9 @@ public class StateSpaceSearch {
     if(goal.getTaskId() > -1) {      
       String[] s = goal.getSequence().split("");      
       for(int i = 1; i < s.length; i++) {
-        currentValue += taskList.get(Integer.parseInt(s[i])).getValue();
-        currentDeadline += taskList.get(Integer.parseInt(s[i])).getTime();
+        Task t = taskList.get(Integer.parseInt(s[i]));
+        currentValue += t.getValue();
+        currentDeadline += t.getTime();
       }
     }
     
@@ -178,8 +177,8 @@ public class StateSpaceSearch {
 
         } else if(indegree > 0) {
           for(Task t : Graphs.predecessorListOf(g, task)) {
-            if(indegree > sequenceLength                
-                || !currentSequence.contains(Integer.toString(t.getId()))) {              
+            if(indegree > sequenceLength ||               
+                !currentSequence.contains(Integer.toString(t.getId()))) {              
               valid = false;
               break;
             }
