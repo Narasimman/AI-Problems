@@ -1,5 +1,11 @@
 package PS1;
 
+/**
+ * Represents a Task in the scheduling problem.
+ * Each task has a value and the time parameters
+ * @author Narasimman
+ *
+ */
 public class Task {
   private int id;
   private int value;

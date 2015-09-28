@@ -12,15 +12,26 @@ import java.util.Scanner;
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.DirectedGraph;
 
+/**
+ * Main driver that generates random samples as per the stated problem
+ * and call the space search algorithms and builds statistics.
+ * @author Narasimman
+ *
+ */
 public class MainDriver {
   private List<Task> taskList = new ArrayList<Task>();
   private DirectedGraph<Task, DefaultEdge> graph;
   private StateSpaceSearch search;
-
+  private static Statistics stats = new Statistics();
+  
+  /**
+   * Constructor
+   * @param inputFile
+   */
   public MainDriver(String inputFile) {
     Task start = new Task(-1, 0, 0);
 
-    try(Scanner scanner = new Scanner(new File("input"));) {      
+    try(Scanner scanner = new Scanner(new File(inputFile));) {      
       int numberOfTasks = scanner.nextInt();
       int targetValue = scanner.nextInt();
       int targetDeadline = scanner.nextInt();
@@ -44,8 +55,8 @@ public class MainDriver {
 
       DependencyGraph g = new DependencyGraph();      
       graph = g.createDependencyGraph(taskList, dep);
-
-      search = new StateSpaceSearch(taskList, graph);
+      
+      search = new StateSpaceSearch(taskList, graph);      
       search.initialize(start, goal, maxFrontierSize);
       scanner.close();
     } catch (FileNotFoundException e) {
@@ -53,9 +64,31 @@ public class MainDriver {
     }
   }
 
-  void run() {
+  /**
+   * Run method to initiate search and collect stats
+   */
+  private void run() {
     search.doBFS();
-    search.displayResult();    
+    stats.addToList(search.getStat());
+  }
+  
+  /**
+   * Display the statistics collected
+   */
+  static void displayResult() {
+    int count = 0;
+    List<Statistics> statList = stats.getStats();
+    for(Statistics stat : stats.getStats()) {
+      System.out.println("------------------------");
+      System.out.println("Result " + count);
+      System.out.println("Search Output: " + stat.getResult());
+      System.out.println("Is search successful: " + stat.getIsSuccess());      
+      System.out.println("Total Number of states in the tree: " + stat.getNumberOfStates());
+      System.out.println("Total Number of frontier states during searching: " + stat.getNumberOfFrontierStates());
+      System.out.println("------------------------");
+      count++;
+    }
+    System.out.println("Total Number of searches: " + statList.size());
   }
 
   /**
@@ -98,7 +131,7 @@ public class MainDriver {
 
       for (int I=0; I < N-1; I++) {
         for (int J = I+1; J < N; J++) {
-          if(r1.nextInt(100) <= 50) {
+          if(r1.nextInt(100) <= 20) {
             sb.append((P.get(I) -1 ) + " " + (P.get(J) - 1) + "\n");
           }
         }
@@ -108,7 +141,7 @@ public class MainDriver {
       
       MainDriver driver = new MainDriver(inputFile);
       driver.run();
-
     }
+    MainDriver.displayResult();
   }
 }

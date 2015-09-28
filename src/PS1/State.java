@@ -3,7 +3,12 @@ package PS1;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Represents the state of the problem. Every state is unique in a state space tree.
+ * The property sequence is unique and represents the sequence of tasks added.
+ * @author Narasimman
+ *
+ */
 public class State {
   private int id;
   private int taskId;
@@ -53,6 +58,12 @@ public class State {
     return false;
   }
 
+  /**
+   * Compute the cumulative value and time of the current state 
+   * from its sequence
+   * @param taskList
+   * @return
+   */
   Map<String, Integer> computeCumulateValues(List<Task> taskList) {
     Map<String, Integer> map = new HashMap<String, Integer>();
     int currentValue = 0;
@@ -77,6 +88,6 @@ public class State {
 
   @Override
   public String toString() {
-    return "" + this.sequence;
+    return " " + this.sequence;
   }
 }
