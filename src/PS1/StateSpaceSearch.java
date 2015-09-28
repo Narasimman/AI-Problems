@@ -31,7 +31,8 @@ public class StateSpaceSearch {
   private State goalState;
   private Task resultTask;
   private int maxFrontierSize;
-
+  private int stateCounter;
+  
   private List<Task> taskList;
   private DirectedGraph<Task, DefaultEdge> g;
   
@@ -49,7 +50,8 @@ public class StateSpaceSearch {
   public void initialize(Task s, Task g, int maxFrontierSize) {
     this.start = s;
     this.goal = g;
-    this.root = new State(start.getId(), 0);
+    this.stateCounter = 0;
+    this.root = new State(stateCounter, start.getId(), 0);
     this.maxFrontierSize = maxFrontierSize;
     constructSpaceSearchTree();
   }
@@ -97,7 +99,7 @@ public class StateSpaceSearch {
     }
   }
 
-  void doIterativeDeepening(Queue<State> frontier) {
+  private void doIterativeDeepening(Queue<State> frontier) {
     boolean proceed = false;
     int depth = 0;
     while(!proceed && depth <= this.taskList.size())
@@ -156,6 +158,7 @@ public class StateSpaceSearch {
     }
     return false;
   }
+
   private boolean isGoalReached(State goal) {
     Map<String, Integer> map = goal.computeCumulateValues(this.taskList);  
     
@@ -177,7 +180,7 @@ public class StateSpaceSearch {
     while(orderIterator.hasNext()) {
       Task task = orderIterator.next();
       if(g.inDegreeOf(task) < 1) {
-        State s = new State(task.getId(), root.getDepth() + 1);
+        State s = new State(this.stateCounter + 1, task.getId(), root.getDepth() + 1);
         s.setSequence(Integer.toString(task.getId()));
         stateSpaceTree.addVertex(s);
         stateSpaceTree.addEdge(root, s);
@@ -233,7 +236,7 @@ public class StateSpaceSearch {
    * @return new state created
    */
   private State addNewStateToTree(int taskId, State currentState, String currentSequence) {
-    State newState = new State(taskId, currentState.getDepth() + 1);
+    State newState = new State(this.stateCounter + 1, taskId, currentState.getDepth() + 1);
     newState.setSequence(currentSequence + Integer.toString(taskId));
     stateSpaceTree.addVertex(newState);
     stateSpaceTree.addEdge(currentState, newState);   

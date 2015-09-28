@@ -20,7 +20,7 @@ public class DependencyGraph {
     for(int i = 0; i < dep.size(); i+=2) {
       graph.addEdge(list.get(dep.get(i)), list.get(dep.get(i + 1)));
     }
-    
+    System.out.println(graph);
     return graph;
   }
 

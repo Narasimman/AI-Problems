@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 public class State {
+  private int id;
   private int taskId;
   private int depth;
   private boolean visited;
   private String sequence;
   
-  public State(int id, int depth) {
-    this.taskId = id;
+  public State(int id, int taskId, int depth) {
+    this.id = id;
+    this.taskId = taskId;
     this.visited = false;
     this.depth = depth;
   }
@@ -69,6 +71,10 @@ public class State {
     return map;    
   }
   
+  public int getId() {
+    return id;
+  }
+
   @Override
   public String toString() {
     return "" + this.sequence;
