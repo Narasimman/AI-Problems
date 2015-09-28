@@ -137,6 +137,11 @@ public class MainDriver {
    * @param args
    */
   public static void main(String[] args) {
+    if(args.length < 2) {
+      System.out.println("Invalid number of arguments. Expected <N,E>");
+      System.exit(-1);
+    }
+    
     int N = Integer.parseInt(args[0]);
     int E = Integer.parseInt(args[1]);
     String inputFile = "input2";
