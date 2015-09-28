@@ -4,8 +4,11 @@
 package PS1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -27,9 +30,12 @@ public class StateSpaceSearch {
   private boolean goalFound;
   private State goalState;
   private Task resultTask;
+  private int maxFrontierSize;
 
   private List<Task> taskList;
   private DirectedGraph<Task, DefaultEdge> g;
+  
+  private Map<String, Boolean> searchMap = new HashMap<String, Boolean>();
 
   private DirectedGraph<State, DefaultEdge> stateSpaceTree = 
       new DefaultDirectedGraph<State, DefaultEdge>(DefaultEdge.class);
@@ -40,13 +46,18 @@ public class StateSpaceSearch {
     this.goalFound = false;    
   }
 
-  public void initialize(Task s, Task g) {
+  public void initialize(Task s, Task g, int maxFrontierSize) {
     this.start = s;
     this.goal = g;
     this.root = new State(start.getId(), 0);
+    this.maxFrontierSize = maxFrontierSize;
     constructSpaceSearchTree();
   }
 
+  /**
+   * Display the result if the goal is found
+   * or print 0 if not found
+   */
   public void displayResult() {
     if(this.goalFound) { 
       System.out.println("[" + this.goalState.getSequence() + "] " + 
@@ -58,39 +69,54 @@ public class StateSpaceSearch {
 
   void doBFS() {
     List<State> children = new ArrayList<State>();
-    Queue<State> fringe = new LinkedList<State>();
-    fringe.add(root);
-    while (!fringe.isEmpty())
-    {
-      State parent = fringe.poll();
-      if (this.isGoalReached(parent))
-      {
+    Queue<State> frontier = new LinkedList<State>();
+    boolean isFrontierFull = false;
+    frontier.add(root);
+    
+    while (!frontier.isEmpty() && !isFrontierFull) {
+      State parent = frontier.poll();
+      if (this.isGoalReached(parent)) {
         goalFound = true;
         goalState = parent;
         break;
       }
       children = Graphs.successorListOf(stateSpaceTree, parent);        
       for (int i = 0; i < children.size(); i++) {
-        fringe.add(children.get(i));
+        State child = children.get(i);
+        if(frontier.size() <= this.maxFrontierSize && !isVisited(child)) {
+          frontier.add(child);
+        } else {
+          isFrontierFull = true;
+          break;
+        }
       }
+    }
+    
+    if(!frontier.isEmpty()) {
+      doIterativeDeepening(frontier);
     }
   }
 
-  void doIterativeDeepening() {
+  void doIterativeDeepening(Queue<State> frontier) {
     boolean proceed = false;
     int depth = 0;
     while(!proceed && depth <= this.taskList.size())
     {
       //System.out.println("Search Goal at Depth" + depth);
-      proceed = Depth_Limited_Search(depth, proceed);
+      proceed = Depth_Limited_Search(frontier, depth, proceed);
       depth++;
-    }     
+    }
   }
 
-  private boolean Depth_Limited_Search(int depthLimit, boolean proceed) {
+  private boolean Depth_Limited_Search(Queue<State> frontier, int depthLimit, boolean proceed) {
     List<State> children = new ArrayList<State>();
     Stack<State> fringe = new Stack<State>();
-    fringe.push(root);
+    if(!frontier.isEmpty()) {
+      while(!frontier.isEmpty()) {
+        fringe.push(frontier.poll());
+      }
+    }
+    
     while (!fringe.isEmpty())
     {
       State parent = fringe.pop();
@@ -109,39 +135,41 @@ public class StateSpaceSearch {
       } else {
         children = Graphs.successorListOf(stateSpaceTree, parent);
         for (int i = 0; i < children.size(); i++) {
-          fringe.push(children.get(i));
+          State child = children.get(i);
+          if(!isVisited(child))
+          fringe.push(child);
         }
       }         
     }
     return proceed;
   }
 
-  private boolean isGoalReached(State goal) {
-    int currentValue = 0;
-    int currentDeadline = 0;
-
-    if(goal.getTaskId() > -1) {      
-      String[] s = goal.getSequence().split("");      
-      for(int i = 1; i < s.length; i++) {
-        Task t = taskList.get(Integer.parseInt(s[i]));
-        currentValue += t.getValue();
-        currentDeadline += t.getTime();
-      }
+  private boolean isVisited(State state) {
+    String sequence = state.getSequence();
+    char[] c = sequence.toCharArray(); 
+    Arrays.sort(c);
+    String sortedSequence = new String(c);
+    if(!searchMap.containsKey(sortedSequence)) {
+      searchMap.put(sortedSequence, true);
+    } else {
+      return true;
     }
+    return false;
+  }
+  private boolean isGoalReached(State goal) {
+    Map<String, Integer> map = goal.computeCumulateValues(this.taskList);  
     
-    if(currentValue >= this.goal.getValue() && currentDeadline <= this.goal.getTime()) {
-      this.resultTask = new Task(-1, currentValue, currentDeadline);
+    if(map.get("value") >= this.goal.getValue() && map.get("time") <= this.goal.getTime()) {
+      this.resultTask = new Task(-1, map.get("value"), map.get("time"));
       return true;
     }
     
     return false;
-
   }
 
   private void constructSpaceSearchTree() {
     Queue<State> stateQueue = new LinkedList<State>();
     stateSpaceTree.addVertex(root);
-    //stateQueue.add(root);
     TopologicalOrderIterator<Task, DefaultEdge> orderIterator;
     orderIterator = new TopologicalOrderIterator<Task, DefaultEdge>(g);
 
@@ -172,8 +200,9 @@ public class StateSpaceSearch {
 
         if(indegree < 1 && !currentSequence.contains(sTaskId)
             && g.inDegreeOf(taskList.get(Integer.parseInt(currentSequence.substring(sequenceLength - 1)))) < 1){
-
-          stateQueue.add(addNewStateToTree(taskId, currentState, currentSequence));    
+          if(currentState.isValidState(taskList, this.goal)) {
+            stateQueue.add(addNewStateToTree(taskId, currentState, currentSequence));
+          }
 
         } else if(indegree > 0) {
           for(Task t : Graphs.predecessorListOf(g, task)) {
@@ -185,7 +214,9 @@ public class StateSpaceSearch {
           }
 
           if(valid && !currentSequence.contains(sTaskId)) {
-            stateQueue.add(addNewStateToTree(taskId, currentState, currentSequence));
+            if(currentState.isValidState(taskList, this.goal)) {
+              stateQueue.add(addNewStateToTree(taskId, currentState, currentSequence));
+            }
           }
         }
       }
@@ -193,7 +224,7 @@ public class StateSpaceSearch {
 
     System.out.println(stateSpaceTree);
   }
-
+    
   /**
    * Create new vertex and add it to the state space tree.
    * @param taskId
@@ -207,6 +238,10 @@ public class StateSpaceSearch {
     stateSpaceTree.addVertex(newState);
     stateSpaceTree.addEdge(currentState, newState);   
     return newState;
+  }
+
+  public List<Task> getTaskList() {
+    return taskList;
   }
 
 }

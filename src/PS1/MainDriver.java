@@ -21,7 +21,7 @@ public class MainDriver {
       int numberOfTasks = scanner.nextInt();
       int targetValue = scanner.nextInt();
       int targetDeadline = scanner.nextInt();
-      int maxSize = scanner.nextInt();
+      int maxFrontierSize = scanner.nextInt();
 
       Task goal = new Task(-2, targetValue, targetDeadline);
       for (int i = 0; i < numberOfTasks; i ++) {
@@ -43,7 +43,7 @@ public class MainDriver {
       graph = g.createDependencyGraph(taskList, dep);
 
       search = new StateSpaceSearch(taskList, graph);
-      search.initialize(start, goal);
+      search.initialize(start, goal, maxFrontierSize);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -51,9 +51,7 @@ public class MainDriver {
 
   void run() {
     search.doBFS();
-    search.displayResult();
-    search.doIterativeDeepening();
-    search.displayResult();
+    search.displayResult();    
   }
 
   /**
