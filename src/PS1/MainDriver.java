@@ -57,7 +57,7 @@ public class MainDriver {
       graph = g.createDependencyGraph(taskList, dep);
 
       search = new StateSpaceSearch(taskList, graph);      
-      search.initialize(start, goal, maxFrontierSize);
+      search.initialize(start, goal, maxFrontierSize);      
       scanner.close();
     } catch (FileNotFoundException e) {
       System.out.println("Input file not found by the Driver");
@@ -75,20 +75,63 @@ public class MainDriver {
   /**
    * Display the statistics collected
    */
-  static void displayResult() {
+  static void displayResult(boolean verbose) {
     int count = 0;
     List<Statistics> statList = stats.getStats();
+    int numberOfSuccess = 0;
+    int minFStates = Integer.MAX_VALUE;
+    int maxFStates = 0;
+    int totalFStates = 0;
+    int minStates = Integer.MAX_VALUE;
+    int maxStates = 0;
+    int totalStates = 0;    
     for(Statistics stat : stats.getStats()) {
-      System.out.println("------------------------");
-      System.out.println("Result " + count);
-      System.out.println("Search Output: " + stat.getResult());
-      System.out.println("Is search successful: " + stat.getIsSuccess());      
-      System.out.println("Total Number of states in the tree: " + stat.getNumberOfStates());
-      System.out.println("Total Number of frontier states during searching: " + stat.getNumberOfFrontierStates());
-      System.out.println("------------------------");
+      int fStates = stat.getNumberOfFrontierStates();
+      int states = stat.getNumberOfStates();
+      if(verbose) {
+        System.out.println("------------------------");
+        System.out.println("Result " + count);
+        System.out.println("Search Output: " + stat.getResult());
+        System.out.println("Is search successful: " + stat.getIsSuccess());      
+        System.out.println("Total Number of states in the tree: " + stat.getNumberOfStates());
+        System.out.println("Total Number of frontier states during searching: " + fStates);
+        System.out.println("------------------------");
+      }
+      if(stat.getIsSuccess()) {
+        numberOfSuccess++;
+      }
+
+      if(maxFStates < fStates) {
+        maxFStates = fStates;
+      }
+
+      if(minFStates > fStates) {
+        minFStates = fStates;
+      }
+      if(maxStates < states) {
+        maxStates = states;
+      }
+
+      if(minStates > states) {
+        minStates = states;
+      }
+
+      totalFStates += fStates;
+      totalStates += states;
       count++;
     }
-    System.out.println("Total Number of searches: " + statList.size());
+
+    double fSuccess = (double)numberOfSuccess/(double)statList.size() * 100;
+    double avgFStates = (double)totalFStates / (double) statList.size();
+    double avgStates = (double)totalStates / (double) statList.size();
+    System.out.println("Total Number of Successful searches: " + numberOfSuccess);
+    System.out.println("Total Number of searches: " + statList.size());    
+    System.out.println("Fraction of successful searches(%): " +  fSuccess);
+    System.out.println("Min | Max | Avg number of states in State Space Tree: " +
+        minStates + " | " + maxStates + " | " + avgStates);
+    System.out.println("Min | Max | Avg number of FRONTIER states in search process: " +
+        minFStates + " | " + maxFStates + " | " + avgFStates);
+    
   }
 
   /**
@@ -109,10 +152,13 @@ public class MainDriver {
         rangeFrom.intValue()) + rangeFrom.intValue();
     int maxFrontier = r.nextInt(N - 3) + 3;
 
+    //N targetValue targetDeadline max
     sb.append(N + " " + targetValue + " " + 
         targetDeadline + " " + maxFrontier + "\n");
     List<Integer> P = new ArrayList<Integer>();
     Random r1 = new Random(N);
+
+    // Task value time
     for (int i = 0; i < N; i++) {
       int value = r1.nextInt(N-1) + 1;
       int time = r1.nextInt(N-1) + 1;
@@ -123,9 +169,10 @@ public class MainDriver {
     /* Construct a random permutation */
     Collections.shuffle(P, r1);
 
+    // Dependency tree
     for (int I=0; I < N-1; I++) {
       for (int J = I+1; J < N; J++) {
-        if(r1.nextInt(100) <= 20) {
+        if(r1.nextInt(100) < 3) {
           sb.append((P.get(I) -1 ) + " " + (P.get(J) - 1) + "\n");
         }
       }
@@ -141,26 +188,38 @@ public class MainDriver {
       System.out.println("Invalid number of arguments. Expected <N,E>");
       System.exit(-1);
     }
-    
+
     int N = Integer.parseInt(args[0]);
     int E = Integer.parseInt(args[1]);
-    String inputFile = "input2";
+    boolean verbose = false;
+
+    if(args.length > 2 && args[2].equals("verbose")) {
+      verbose = true;
+    }
+
+    String inputFile = "input1";
     PrintWriter out = null;
     String input;
-    for (int k = 0; k < E; k++) {
-      input = MainDriver.generateRandomDAG(N);
-      try {
-        out = new PrintWriter(inputFile);
-        out.write(input);        
-      } catch (FileNotFoundException e) {
-        System.out.println("Problem in generating input file");
-      } finally {      
-        out.close();
-      }
+    for(int i = N; i < N + 5; i++) {
+      stats = new Statistics();
+      System.out.println("For N = " + i);
+      System.out.println("===============================");
+      for (int k = 0; k < E; k++) {
+        input = MainDriver.generateRandomDAG(i);
+        try {
+          out = new PrintWriter(inputFile);
+          out.write(input);        
+        } catch (FileNotFoundException e) {
+          System.out.println("Problem in generating input file");
+        } finally {      
+          out.close();
+        }
 
-      MainDriver driver = new MainDriver(inputFile);
-      driver.run();
+        MainDriver driver = new MainDriver(inputFile);
+        driver.run();
+      }
+      MainDriver.displayResult(verbose);
+      System.out.println("===============================");
     }
-    MainDriver.displayResult();
   }
 }
