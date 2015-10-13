@@ -1,4 +1,4 @@
-package PS1;
+package ps1;
 
 /**
  * Represents a Task in the scheduling problem.

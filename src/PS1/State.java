@@ -1,4 +1,4 @@
-package PS1;
+package ps1;
 
 import java.util.HashMap;
 import java.util.List;

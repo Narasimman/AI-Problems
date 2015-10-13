@@ -1,4 +1,4 @@
-package PS1;
+package ps1;
 
 import java.util.ArrayList;
 import java.util.List;
