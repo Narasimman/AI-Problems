@@ -21,9 +21,11 @@ public class FileHandler {
     
     String line;
     while((line = br.readLine()) != null) {
-      String[] atomIds = line.split(" ");
-      for (String atomId : atomIds) {
-        System.out.println(atomId);
+      String[] tokens = line.split(" ");
+      for (String token : tokens) {
+        System.out.println(token);
+        Literal literal = new Literal(Integer.parseInt(token));
+        
       }
       
     }    
