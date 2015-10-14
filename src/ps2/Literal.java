@@ -8,4 +8,8 @@ public class Literal {
     this.literal = literal;
     this.atom = Math.abs(literal);
   }
+  
+  public int getAtom() {
+    return this.atom;
+  }
 }

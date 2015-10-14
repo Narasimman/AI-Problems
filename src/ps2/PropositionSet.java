@@ -11,4 +11,7 @@ public class PropositionSet {
     this.clauses.add(clause);
   }
   
+  public List<Clause> getClauses() {
+    return this.clauses;
+  }
 }

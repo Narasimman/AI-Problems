@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 
 public class FileHandler {
   private File inputFile;
+  private PropositionSet prop = new PropositionSet();
   
   public FileHandler(String filePath) {
     inputFile = new File(filePath);
@@ -20,15 +21,24 @@ public class FileHandler {
     BufferedReader br = new BufferedReader(new InputStreamReader(in));
     
     String line;
+    int i = 0;
+    
     while((line = br.readLine()) != null) {
       String[] tokens = line.split(" ");
+      Clause clause = new Clause(i);
       for (String token : tokens) {
-        System.out.println(token);
         Literal literal = new Literal(Integer.parseInt(token));
-        
+        clause.addLiteral(literal);
       }
-      
-    }    
+      prop.addClause(clause);
+      i++;
+    }
+    
+    br.close();
+  }
+  
+  public PropositionSet getPropositionSet() {
+    return this.prop;
   }
 
 }
