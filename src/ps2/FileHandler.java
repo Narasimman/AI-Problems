@@ -11,11 +11,11 @@ public class FileHandler {
   private File inputFile;
   private PropositionSet prop = new PropositionSet();
   
-  public FileHandler(String filePath) {
+  FileHandler(String filePath) {
     inputFile = new File(filePath);
   }
   
-  public void read() throws IOException{
+  void read() throws IOException{
     FileInputStream fstream = new FileInputStream(inputFile);
     DataInputStream in = new DataInputStream(fstream);
     BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -37,7 +37,7 @@ public class FileHandler {
     br.close();
   }
   
-  public PropositionSet getPropositionSet() {
+  PropositionSet getPropositionSet() {
     return this.prop;
   }
 

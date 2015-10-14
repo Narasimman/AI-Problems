@@ -7,11 +7,11 @@ public class PropositionSet {
   
   private List<Clause> clauses = new ArrayList<Clause>();
   
-  public void addClause(Clause clause) {
+  void addClause(Clause clause) {
     this.clauses.add(clause);
   }
   
-  public List<Clause> getClauses() {
+  List<Clause> getClauses() {
     return this.clauses;
   }
 }

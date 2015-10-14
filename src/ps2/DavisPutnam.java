@@ -5,20 +5,26 @@ import java.io.IOException;
 public class DavisPutnam {
   private PropositionSet prop;
   
-  public DavisPutnam(String filePath) {
+  DavisPutnam(String filePath) {
     FileHandler f = new FileHandler(filePath);
     try {
       f.read();
-      f.getPropositionSet();
-      prop = f.getPropositionSet();
+      this.prop = f.getPropositionSet();
     } catch (IOException e) {
       System.out.println("Bad Input file path");
       
     }
   }
+  /**
+   * Compute the Davis Putnam algorithm and return the result
+   * @return
+   */
+  boolean compute() {
+    return false;
+  }
   
   public static void main(String[] args) {
     DavisPutnam dp = new DavisPutnam("dp-input");
+    dp.compute();
   }
-
 }
