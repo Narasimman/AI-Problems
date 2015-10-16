@@ -15,6 +15,11 @@ public class FileHandler {
     inputFile = new File(filePath);
   }
   
+  /**
+   * Read the input file from the path and construct 
+   * necessary data structures for the DP algorithm
+   * @throws IOException
+   */
   void read() throws IOException{
     FileInputStream fstream = new FileInputStream(inputFile);
     DataInputStream in = new DataInputStream(fstream);

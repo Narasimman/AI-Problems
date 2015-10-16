@@ -12,4 +12,8 @@ public class Literal {
   int getAtom() {
     return this.atom;
   }
+  
+  int getLiteral() {
+    return this.literal;
+  }
 }

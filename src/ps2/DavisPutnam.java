@@ -1,9 +1,12 @@
 package ps2;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DavisPutnam {
   private PropositionSet prop;
+  private List<Literal> atomValues = new ArrayList<Literal>();
   
   DavisPutnam(String filePath) {
     FileHandler f = new FileHandler(filePath);
@@ -20,6 +23,7 @@ public class DavisPutnam {
    * @return
    */
   boolean compute() {
+    
     return false;
   }
   

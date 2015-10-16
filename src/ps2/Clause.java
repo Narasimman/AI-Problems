@@ -18,4 +18,16 @@ public class Clause {
   public List<Literal> getLiterals() {
     return this.literals;
   }
+  
+  public boolean isSingleton() {
+    return literals.size() == 1;
+  }
+  
+  public boolean isEmpty() {
+    return literals.isEmpty();
+  }
+
+  public boolean contains(Literal literal) {
+    return literals.contains(literal);
+  }
 }
