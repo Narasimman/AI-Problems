@@ -37,6 +37,21 @@ public class PropositionSet {
     return null;
   }
   
+  public void propagate(Literal literal) {
+    // remove satisfied clauses
+    List<Clause> removable = new ArrayList<Clause>();
+    for (Clause clause : clauses) {
+      if (clause.contains(literal)) {
+        removable.add(clause);
+      }
+    }
+    clauses.removeAll(removable);
+    
+    for (Clause clause : clauses) {
+      clause.propagate(literal);
+    }
+  }
+  
   void addClause(Clause clause) {
     this.clauses.add(clause);
   }

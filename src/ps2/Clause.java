@@ -7,27 +7,32 @@ public class Clause {
   private int id;
   private List<Literal> literals = new ArrayList<Literal>();
 
-  public Clause(int id) {
+  Clause(int id) {
     this.id = id;
   }
   
-  public void addLiteral(Literal literal) {
+  void addLiteral(Literal literal) {
     this.literals.add(literal);
   }
   
-  public List<Literal> getLiterals() {
+  List<Literal> getLiterals() {
     return this.literals;
   }
   
-  public boolean isSingleton() {
+  boolean isSingleton() {
     return literals.size() == 1;
   }
   
-  public boolean isEmpty() {
+  boolean isEmpty() {
     return literals.isEmpty();
   }
 
-  public boolean contains(Literal literal) {
+  boolean contains(Literal literal) {
     return literals.contains(literal);
   }
+  
+  boolean propagate(Literal literal) {
+    return literals.remove(literal);
+  }
+  
 }
