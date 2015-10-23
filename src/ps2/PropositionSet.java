@@ -24,6 +24,15 @@ public class PropositionSet {
     return clauses.isEmpty();
   }
   
+  @Override
+  public PropositionSet clone() {
+    PropositionSet ps = new PropositionSet();
+    for (Clause clause : this.clauses) {
+      ps.addClause(clause.copy());
+    }    
+    return ps;
+  }
+  
   /**
    * Returns the first singleton clause identified
    * @return

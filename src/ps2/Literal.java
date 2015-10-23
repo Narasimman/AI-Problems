@@ -13,6 +13,10 @@ public class Literal {
     return this.atom;
   }
   
+  public Literal copy() {
+    return new Literal(this.literal);
+  }
+  
   int getLiteral() {
     return this.literal;
   }

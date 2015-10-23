@@ -15,14 +15,16 @@ public class DavisPutnam {
       this.prop = f.getPropositionSet();
     } catch (IOException e) {
       System.out.println("Bad Input file path");
-      
     }
   }
+
   /**
    * Compute the Davis Putnam algorithm and return the result
    * @return
    */
   boolean compute() {
+    
+    PropositionSet clone = this.prop.clone();
     
     return false;
   }

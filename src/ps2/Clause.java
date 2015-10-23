@@ -19,6 +19,14 @@ public class Clause {
     return this.literals;
   }
   
+  public Clause copy() {
+    Clause c = new Clause(this.id);
+    for(Literal literal : literals){
+      c.addLiteral(literal.copy());
+    }
+    return c;
+  }
+  
   boolean isSingleton() {
     return literals.size() == 1;
   }
