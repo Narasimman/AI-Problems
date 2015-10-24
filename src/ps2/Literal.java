@@ -20,4 +20,9 @@ public class Literal {
   int getLiteral() {
     return this.literal;
   }
+  
+  Literal negative() {
+    return new Literal(-this.literal);
+  }
+
 }
