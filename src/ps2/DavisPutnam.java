@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DavisPutnam {
   private PropositionSet prop;
-  private List<Literal> atomValues = new ArrayList<Literal>();
+  private List<Literal> valuation = new ArrayList<Literal>();
   
   DavisPutnam(String filePath) {
     FileHandler f = new FileHandler(filePath);
@@ -22,15 +22,29 @@ public class DavisPutnam {
    * Compute the Davis Putnam algorithm and return the result
    * @return
    */
-  boolean compute() {
+  boolean compute(PropositionSet propositionSet) {
     
-    PropositionSet clone = this.prop.clone();
+    // Success
+    if(propositionSet.isEmpty()) {
+      valuation.addAll(propositionSet.getAtoms());
+      return true;
+    }
+    
+    if(propositionSet.containsEmptyClause()) {
+      return false;
+    }
+    
+    
+    
+    
     
     return false;
   }
   
   public static void main(String[] args) {
+    
     DavisPutnam dp = new DavisPutnam("dp-input");
-    dp.compute();
+    PropositionSet clone = dp.prop.clone();
+    dp.compute(clone);
   }
 }
