@@ -34,8 +34,10 @@ public class FileHandler {
       for (String token : tokens) {
         Literal literal = new Literal(Integer.parseInt(token));
         clause.addLiteral(literal);
+        prop.addAtom(literal);
       }
       prop.addClause(clause);
+      
       i++;
     }
     

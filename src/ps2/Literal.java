@@ -1,12 +1,14 @@
 package ps2;
 
-public class Literal {
+import java.util.Comparator;
+
+public class Literal implements Comparator<Literal>, Comparable<Literal>{
   private int literal;
   private int atom;
   
   Literal(int literal) {
     this.literal = literal;
-    this.atom = Math.abs(literal);
+    this.atom = literal;
   }
   
   int getAtom() {
@@ -22,7 +24,38 @@ public class Literal {
   }
   
   Literal negative() {
-    return new Literal(-this.literal);
+    return new Literal(-this.atom);
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    Literal atom = (Literal) obj;
+    return this.literal == atom.literal;
+  }
+
+  @Override
+  public int hashCode() {
+    return this.literal;
+  }
+
+  @Override
+  public String toString() {
+    return "" + literal;
+  }
+
+  @Override
+  public int compare(Literal arg0, Literal arg1) {
+    if (Math.abs(arg0.literal) == Math.abs(arg1.literal)) {
+      return 0;
+    } else if (Math.abs(arg0.literal) > Math.abs(arg1.literal)) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+
+  public int compareTo(Literal arg1) {
+    return this.compare(this, arg1);
   }
 
 }
