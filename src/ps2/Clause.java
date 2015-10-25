@@ -39,6 +39,7 @@ public class Clause {
     return literals.contains(literal);
   }
   
+  
   void propagate(Literal literal) {
     literals.remove(literal);
     literals.remove(literal.negative());

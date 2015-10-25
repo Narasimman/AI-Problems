@@ -93,21 +93,35 @@ public class PropositionSet {
       }
     }
     // find difference between sets
-    Set<Literal> diff = difference(positiveSet, negativeSet);
+    Literal diff = difference(positiveSet, negativeSet);
+    
+    
     // if pure literal found, return first one
-    System.out.println("DIFF  " + diff);
-    if (!diff.isEmpty()) {
-      return diff.toArray(new Literal[0])[0];
+    System.out.println("DIFF    "  + diff);
+    if (null != diff) {
+      return diff;
     }
     return null;
   }
 
-  private Set<Literal> difference(Set<Literal> positiveSet, Set<Literal> negativeSet) {
-    // may be simplified
-    Iterator<Literal> it1 = positiveSet.iterator();
-    Iterator<Literal> it2 = negativeSet.iterator();
+  private Literal difference(Set<Literal> positiveSet, Set<Literal> negativeSet) {
     
-    Set<Literal> res = new HashSet<Literal>();
+    Iterator<Literal> it1 = positiveSet.iterator();
+    Iterator<Literal> it2 = negativeSet.iterator();    
+    
+    while(it1.hasNext()) {
+      System.out.println("first   " + it1.next());
+    }
+    
+    while(it2.hasNext()) {
+      System.out.println("second   " + it2.next());
+    }
+ 
+    it1 = positiveSet.iterator();
+    it2 = negativeSet.iterator();    
+    
+    
+    Literal res = null;
     boolean firstAhead = true;
     boolean secondAhead = true;
     Literal first = null;
@@ -133,24 +147,26 @@ public class PropositionSet {
 
       // first iterator runs to the end
       if (first == null && second != null) {
-        res.add(second);
+        res = second;
         secondAhead = true;
-        continue;
+        break;
       }
       // second iterator runs to the end
       if (first != null && second == null) {
-        res.add(first);
+        res = first;
         firstAhead = true;
-        continue;
+        break;
       }
       int equalFlag = first.compareTo(second);
         
       if (equalFlag < 0) {
-        res.add(first);
+        res = first;
         firstAhead = true;
+        break;
       } else if (equalFlag > 0) {
-        res.add(second);
+        res = second;
         secondAhead = true;
+        break;
       } else {
         firstAhead = true;
         secondAhead = true;
