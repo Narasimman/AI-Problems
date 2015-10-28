@@ -4,15 +4,9 @@ import java.util.Comparator;
 
 public class Literal implements Comparator<Literal>, Comparable<Literal>{
   private int literal;
-  private int atom;
   
   Literal(int literal) {
-    this.literal = literal;
-    this.atom = literal;
-  }
-  
-  int getAtom() {
-    return this.atom;
+    this.literal = literal;   
   }
   
   public Literal copy() {
@@ -24,7 +18,7 @@ public class Literal implements Comparator<Literal>, Comparable<Literal>{
   }
   
   Literal negative() {
-    return new Literal(-this.atom);
+    return new Literal(-this.literal);
   }
   
   @Override

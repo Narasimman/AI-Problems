@@ -9,10 +9,11 @@ import java.io.InputStreamReader;
 
 public class FileHandler {
   private File inputFile;
-  private PropositionSet prop = new PropositionSet();
+  private PropositionSet prop;
   
   FileHandler(String filePath) {
     inputFile = new File(filePath);
+    prop = new PropositionSet();
   }
   
   /**
@@ -36,16 +37,17 @@ public class FileHandler {
         clause.addLiteral(literal);
         prop.addAtom(literal);
       }
-      prop.addClause(clause);
-      
+      prop.addClause(clause);      
       i++;
-    }
-    
+    }    
     br.close();
   }
   
+  /**
+   * Getter of the proposition set that is initialized by the read
+   * @return
+   */
   PropositionSet getPropositionSet() {
     return this.prop;
   }
-
 }

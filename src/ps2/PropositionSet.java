@@ -9,14 +9,21 @@ import java.util.TreeSet;
 public class PropositionSet {
 
   private List<Clause> clauses = new ArrayList<Clause>();
-
   private Set<Literal> atoms = new HashSet<Literal>();
+  
+  /**
+   * Constructor initialization
+   */
+  PropositionSet() {
+    clauses = new ArrayList<Clause>();
+    atoms = new HashSet<Literal>();      
+  }
 
   /**
    * Returns boolean if the clause is empty
    * @return
    */
-  public boolean containsEmptyClause() {
+  boolean containsEmptyClause() {
     for (Clause clause : clauses) {
       if (clause.isEmpty()) {
         return true;
@@ -25,7 +32,11 @@ public class PropositionSet {
     return false;
   }
 
-  public boolean isEmpty() {
+  /**
+   * Is the clause empty?
+   * @return
+   */
+  boolean isEmpty() {
     return clauses.isEmpty();
   }
 
@@ -34,7 +45,7 @@ public class PropositionSet {
     PropositionSet ps = new PropositionSet();
 
     for (Clause clause : this.clauses) {
-      ps.addClause(clause.copy());
+      ps.addClause(clause.clone());
     }
 
     for (Literal atom : atoms) {
@@ -48,7 +59,7 @@ public class PropositionSet {
    * Returns the first singleton clause identified
    * @return
    */
-  public Literal findSingletonClause() {
+  Literal findSingletonClause() {
     for (Clause clause : clauses) {
       if (clause.isSingleton()) {
         return clause.getLiterals().get(0);
@@ -57,8 +68,7 @@ public class PropositionSet {
     return null;
   }
 
-  public void propagate(Literal literal) {
-
+  void resolve(Literal literal) {
     this.atoms.remove(literal);
     this.atoms.remove(literal.negative());
 
@@ -72,11 +82,15 @@ public class PropositionSet {
     clauses.removeAll(removable);
 
     for (Clause clause : clauses) {
-      clause.propagate(literal);
+      clause.resolve(literal);
     }
   }
 
-  public Literal findPureLiteral() {
+  /**
+   * Returns the pure literal if found
+   * @return
+   */
+  Literal findPureLiteral() {
     Set<Literal> mySet = new TreeSet<Literal>();
     List<Literal> diff = new ArrayList<Literal>();
 
@@ -114,7 +128,7 @@ public class PropositionSet {
     }
   }
 
-  public Literal getAtom() {
+  Literal getAtom() {
     return atoms.toArray(new Literal[0])[0];
   }
 

@@ -19,82 +19,83 @@ public class DavisPutnam {
     }
   }
 
-  public List<Literal> getValidation() {
-    System.out.println("GET VAL   "  + valuation);
-    
+  List<Literal> getValidation() {    
     return valuation;
   }
+  
+  void resolve(PropositionSet propositionSet, Literal literal) {
+    this.valuation.add(literal);
+    propositionSet.resolve(literal);
+  }
+  
   /**
    * Compute the Davis Putnam algorithm and return the result
    * @return
    */
-  boolean compute(PropositionSet propositionSet) {
+  boolean compute(PropositionSet prop) {
 
-    while(true) {
-      // Success
-      if(propositionSet.isEmpty()) {
-        System.out.println("Final " + valuation);
-        valuation.addAll(propositionSet.getAtoms());
+    while(true) {      
+      // Success case. Empty prop set
+      if(prop.isEmpty()) {
+        valuation.addAll(prop.getAtoms());
         return true;
       }
 
-      if(propositionSet.containsEmptyClause()) {
+      // Failure case. Empty clause
+      if(prop.containsEmptyClause()) {
         return false;
       }
 
-      Literal atom = propositionSet.findPureLiteral();
+      // Find if there is pure literal
+      Literal pureLiteral = prop.findPureLiteral();
 
-      if (atom != null) {
-        // add atom
-        System.out.println("Pure  " + atom);
-        this.valuation.add(atom);
-        propositionSet.propagate(atom);
+      if (pureLiteral != null) {
+        this.resolve(prop, pureLiteral);
       } else {
-        Literal atom1 = propositionSet.findSingletonClause();
-        // remove singleton atoms
-        if (atom1 != null) {
-          System.out.println("SingleTon  " + atom1);
-          this.valuation.add(atom1);
-          propositionSet.propagate(atom1);
+        // No pure literal, check for singleton clause
+        Literal singletonLiteral = prop.findSingletonClause();
+        if (singletonLiteral != null) {
+          this.resolve(prop, singletonLiteral);          
         } else {
           break;
         }
       }
     } // while
 
-    PropositionSet propSetClone = propositionSet.clone();
-    // pick arbitrary atom
-    System.out.println(propSetClone.isEmpty());
+    PropositionSet propSetClone = prop.clone();
+    
+    // pick the first atom
     Literal atom = propSetClone.getAtom();
+    
     // assign atom true
-    System.out.println("Set atom TRUE  " + atom);
     valuation.add(atom);
-    propSetClone.propagate(atom);
+    propSetClone.resolve(atom);
+    
     // recursively run on prop set and validation
     DavisPutnam recurDP = new DavisPutnam();
     boolean satisfied = recurDP.compute(propSetClone);
+    
     // if satisfied
     if (satisfied) {
-      System.out.println("Satisgied    " + valuation);
       this.valuation.addAll(recurDP.getValidation());
       return true;
     } else {
       // assign atom false
-      System.out.println("Set atom FALSE  " + atom);
       valuation.remove(atom);
-      System.out.println("neg  " + atom);
-      System.out.println("neg val  " + valuation);
       valuation.add(atom.negative());
-      // propagate atom
-      propSetClone = propositionSet.clone();
       
-      propSetClone.propagate(atom.negative());
+      // propagate atom
+      propSetClone = prop.clone();
+      
+      propSetClone.resolve(atom.negative());
+      
       // recur
       recurDP = new DavisPutnam();
+      
       boolean sat = recurDP.compute(propSetClone);
+      
       if (sat) {
         this.valuation.addAll(recurDP.getValidation());
-        System.out.println("SAT   " + valuation);
         return true;
       }
       return false;
@@ -118,12 +119,11 @@ public class DavisPutnam {
     Collections.sort(valuation);
     for (Literal atom : valuation) {
       if (atom.getLiteral() > 0) {
-        sb.append(atom + " T \r\n");
+        sb.append(atom + " T \n");
       } else {
-        sb.append(atom.negative() + " F \r\n");
+        sb.append(atom.negative() + " F \n");
       }
     }
-    //sb.append(String.valueOf(0));
     return sb.toString();
   }
 }

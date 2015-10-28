@@ -19,7 +19,7 @@ public class Clause {
     return this.literals;
   }
   
-  public Clause copy() {
+  public Clause clone() {
     Clause c = new Clause(this.id);
     for(Literal literal : literals){
       c.addLiteral(literal.copy());
@@ -40,7 +40,7 @@ public class Clause {
   }
   
   
-  void propagate(Literal literal) {
+  void resolve(Literal literal) {
     literals.remove(literal);
     literals.remove(literal.negative());
   }
