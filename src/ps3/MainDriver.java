@@ -1,12 +1,7 @@
 package ps3;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -27,7 +22,6 @@ public class MainDriver {
       util_f = scanner.nextInt();
       p_s    = scanner.nextDouble();
       
-      
       for (int i = 0; i < number_of_reviewers; i++) {
         Reviewer reviewer = new Reviewer(scanner.nextInt(), 
             scanner.nextDouble(), scanner.nextDouble());
@@ -37,19 +31,15 @@ public class MainDriver {
     } catch(FileNotFoundException e) {
       System.out.println("File not found exception");
     }
-  
   }
-  
-  
+
   public static void main(String[] args) {
     if (args.length < 1) {
       System.out.println("Invalid argument! Please provide valid input path");
       return;
     }
     
-    
-    
+    MainDriver driver = new MainDriver(args[0]);
     
   }
-
 }
