@@ -1,12 +1,14 @@
 package ps3;
 
-public class TerminalNode implements INode {
+import ps3.INode.Type;
+
+public class OutcomeNode implements INode {
   private Type type;
   private int utility;
   
-  TerminalNode(int util) {
+  OutcomeNode(int util) {
     this.utility = util;
-    this.type = Type.TERMINAL;
+    this.type = Type.OUTCOME;
   }
 
   @Override
@@ -17,5 +19,9 @@ public class TerminalNode implements INode {
   @Override
   public int getUtility() {
     return utility;
-  }  
+  }
+  
+  public boolean isOutcomeNode() {
+    return this.type == Type.OUTCOME;
+  }
 }

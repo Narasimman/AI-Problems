@@ -17,5 +17,9 @@ public class ChanceNode implements INode {
   @Override
   public int getUtility() {
     return utility;
-  }  
+  }
+  
+  public boolean isChanceNode() {
+    return this.type == Type.CHANCE;
+  }
 }

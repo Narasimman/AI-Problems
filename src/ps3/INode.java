@@ -5,7 +5,7 @@ public interface INode {
   public enum Type {
     CHANCE,
     CHOICE,
-    TERMINAL
+    OUTCOME
   };
   
   public Type getType();

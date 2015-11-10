@@ -9,6 +9,17 @@ public class Reviewer {
     this.cost = cost;
     this.p_s  = p_s;
     this.p_f  = p_f;
-  }  
-  
+  }
+
+  public int getCost() {
+    return cost;
+  }
+
+  public double getP_s() {
+    return p_s;
+  }
+
+  public double getP_f() {
+    return p_f;
+  }
 }
