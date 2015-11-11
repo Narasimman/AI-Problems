@@ -1,14 +1,14 @@
 package ps3;
 
-import ps3.INode.Type;
-
 public class ChoiceNode implements INode {
   private Type type;
   private int utility;
+  private boolean chance;
   
-  ChoiceNode(int util) {
+  ChoiceNode(int util, boolean chance) {
     this.utility = util;
     this.type = Type.CHOICE;
+    this.chance = chance;
   }
 
   @Override
@@ -23,5 +23,9 @@ public class ChoiceNode implements INode {
   
   public boolean isChoiceNode() {
     return this.type == Type.CHOICE;
+  }
+  
+  public boolean getChance() {
+    return chance;
   }
 }
