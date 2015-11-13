@@ -1,5 +1,7 @@
 package ps3;
 
+import java.util.List;
+
 public interface INode {
   
   public enum Type {
@@ -10,4 +12,5 @@ public interface INode {
   
   public Type getType();
   public int getUtility();
+  public List<Integer> getConsultedList();
 }
