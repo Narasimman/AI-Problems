@@ -6,14 +6,14 @@ import java.util.List;
 public class ChanceNode implements INode {
   private Type type;
   private int utility;
-  private int choice;
+  private Action action;
   private int reviewerId;
   private List<Integer> consultedList = new ArrayList<Integer>();
   
-  ChanceNode(int util, int choice, int reviewer, List<Integer> reviewerList) {
+  ChanceNode(int util, Action choice, int reviewer, List<Integer> reviewerList) {
     this.utility = util;
     this.type = Type.CHANCE;
-    this.choice = choice;
+    this.action = choice;
     this.reviewerId  = reviewer;
     this.consultedList.addAll(reviewerList);
     this.consultedList.add(reviewer);
@@ -33,8 +33,8 @@ public class ChanceNode implements INode {
     return this.type == Type.CHANCE;
   }
 
-  public int getChoice() {
-    return choice;
+  public Action getAction() {
+    return action;
   }
 
   public int getReviewerId() {

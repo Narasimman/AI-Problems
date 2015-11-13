@@ -14,6 +14,8 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
 
+import ps3.INode.Action;
+
 public class MainDriver {
   private int number_of_reviewers;
   private int util_s;
@@ -39,97 +41,79 @@ public class MainDriver {
             scanner.nextDouble(), scanner.nextDouble());
         reviewers.add(reviewer);
       }
-
     } catch(FileNotFoundException e) {
       System.out.println("File not found exception");
     }
   }
 
-  void generateDecisionTree() {
-    INode root = new ChoiceNode(0, false, -1, new ArrayList<Integer>(0));
-    decisionTree.addVertex(root);
-    INode current = root;
-    List<Reviewer> currentReviewerList = reviewers;
+  void initiateDecisionTree() {
+    List<Integer> reviewerList = new ArrayList<Integer>();
+    ChoiceNode root = new ChoiceNode(0, true, -1, reviewerList);
+    recursiveDecisionTree(root);
+  }
 
-    Queue<INode> queue = new ArrayDeque<INode>();
+  void recursiveDecisionTree(INode node) {
+    List<Integer> consultedList ;
+    List<INode> actionNodes = new ArrayList<INode>();
+    
+    switch(node.getType()){
+    case CHANCE:
+      ChanceNode currentChance = (ChanceNode)node;
 
-    for(Reviewer r : currentReviewerList) {
-      List<Integer> l = new ArrayList<Integer>();
-      l.add(r.getId());
-      INode node = new ChanceNode(0, r.getId(), r.getId(), l);
-      decisionTree.addVertex(node);
-      decisionTree.addEdge(current, node);
-      queue.add(node);
-    }   
+      consultedList = currentChance.getConsultedList();
 
-    while(!queue.isEmpty()) {
-      current = queue.poll();
+      if(currentChance.getAction() == Action.PUBLISH) {
+        INode successNode = new OutcomeNode(util_s);
+        actionNodes.add(successNode);
+        
+        INode failureNode = new OutcomeNode(util_f);
+        actionNodes.add(failureNode);
+      } else if(currentChance.getAction() == Action.CONSULT) {
+        INode choiceNode = new ChoiceNode(0, true, 
+            currentChance.getReviewerId(), consultedList);
+        actionNodes.add(choiceNode);
+        INode NoNode = new OutcomeNode(util_f);
+        actionNodes.add(NoNode);        
+      }
+      
+      //Recursive call
+      for(INode actionNode : actionNodes ) {
+        recursiveDecisionTree(actionNode);
+      }
 
-      Reviewer currentReiviewer = null;
-      for (Reviewer r : currentReviewerList) {
-        if(!current.getConsultedList().contains(r.getId())) {
-          System.out.println(">>> " + r.getId() + "   " + current.getConsultedList());
-          currentReiviewer = r;
-          break;
+      break;
+    case CHOICE:
+      ChoiceNode current = (ChoiceNode)node;
+      ChanceNode actionNode;
+
+      consultedList = current.getConsultedList();      
+
+      if(current.getChance()) {
+        actionNode = new ChanceNode(0, INode.Action.PUBLISH, 
+            current.getReviewerId(), consultedList);
+        actionNodes.add(actionNode);  
+      } else {
+        OutcomeNode rejectNode = new OutcomeNode(util_f);    
+      }
+
+
+
+      for(Reviewer r : reviewers) {
+        if(!consultedList.contains(r.getId())) {
+          actionNode = new ChanceNode(0, INode.Action.CONSULT, r.getId(), consultedList);
+          actionNodes.add(actionNode);
         }
       }
 
-      //System.out.println(currentReiviewer);
-      switch (current.getType()) {
-      case CHANCE:
-        if(currentReiviewer != null) {
-          ChanceNode c = (ChanceNode) current;
-          INode yesNode = new ChoiceNode(0, true, c.getReviewerId(), c.getConsultedList());
-          INode noNode = new ChoiceNode(0, false, c.getReviewerId(), c.getConsultedList());
-
-          decisionTree.addVertex(yesNode);
-          decisionTree.addVertex(noNode);
-          decisionTree.addEdge(current, yesNode);
-          decisionTree.addEdge(current, noNode);
-
-          queue.add(yesNode);
-          queue.add(noNode);
-        }
-        break;
-
-      case CHOICE:
-        ChoiceNode c1  = (ChoiceNode) current;
-
-        if(currentReiviewer != null && c1.getChance()) {
-
-          // TODO: Fix this
-          INode publishNode = new ChanceNode(0, 0, -1, c1.getConsultedList());
-          INode consultNode = new ChanceNode(0, 0, currentReiviewer.getId(), c1.getConsultedList());
-
-          decisionTree.addVertex(publishNode);
-          decisionTree.addVertex(consultNode);
-          decisionTree.addEdge(current, publishNode);
-          decisionTree.addEdge(current, consultNode);
-
-          //queue.add(publishNode);
-          queue.add(consultNode);
-
-        } else if (currentReiviewer != null){
-          // TODO: Fix this
-          INode rejectNode = new ChanceNode(0, 1, -1, c1.getConsultedList());
-          INode consultNode = new ChanceNode(0, 1, currentReiviewer.getId(), c1.getConsultedList());
-
-          decisionTree.addVertex(rejectNode);
-          decisionTree.addVertex(consultNode);
-          decisionTree.addEdge(current, rejectNode);
-          decisionTree.addEdge(current, consultNode);
-
-          //queue.add(rejectNode);
-          queue.add(consultNode);          
-        }        
-        break;
-
-      case OUTCOME:
-        break;
-
-      default:
-        break;
+      //Recursive Calls
+      for(INode action : actionNodes) {
+        recursiveDecisionTree(action);
       }
+
+      break;
+    case OUTCOME:
+      System.out.println("Terminal");
+      break;      
     }
   }
 
@@ -145,7 +129,7 @@ public class MainDriver {
 
     MainDriver driver = new MainDriver(args[0]);
 
-    driver.generateDecisionTree();
+    driver.initiateDecisionTree();
 
     for (Reviewer r : driver.getReviewers()) {
       System.out.println(r.getCost());

@@ -10,6 +10,12 @@ public interface INode {
     OUTCOME
   };
   
+  public enum Action {
+    PUBLISH,
+    REJECT,
+    CONSULT
+  };
+  
   public Type getType();
   public int getUtility();
   public List<Integer> getConsultedList();
