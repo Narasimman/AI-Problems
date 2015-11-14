@@ -20,7 +20,6 @@ public class ChanceNode implements INode {
     if(choice == Action.CONSULT) {
       this.consultedList.add(reviewer);
     }
-
   }
 
   @Override
@@ -58,23 +57,24 @@ public class ChanceNode implements INode {
     consultedList = this.getConsultedList();
 
     if(this.getAction() == Action.PUBLISH) {
-      INode successNode = new OutcomeNode(true, consultedList);
+      INode successNode = new OutcomeNode(true, this.getAction(), consultedList);
       actionNodes.add(successNode);
 
-      INode failureNode = new OutcomeNode(false, consultedList);
+      INode failureNode = new OutcomeNode(false, this.getAction(), consultedList);
       actionNodes.add(failureNode);      
     } else if(this.getAction() == Action.CONSULT) {
       INode yesChoiceNode = new ChoiceNode(0, true, 
           this.getReviewerId(), consultedList);
       actionNodes.add(yesChoiceNode);
 
-      if(consultedList.size() == reviewers.size()) {
-        INode noChoiceNode = new ChoiceNode(0, true, 
+      if(consultedList.size() < reviewers.size()) {
+        INode noChoiceNode = new ChoiceNode(0, false,
             this.getReviewerId(), consultedList);
         actionNodes.add(noChoiceNode);
       } else {
-        INode NoNode = new OutcomeNode(false, consultedList);
-        actionNodes.add(NoNode);
+        // Here you don't need to pass the consulted list as this is for reject
+        INode noNode = new OutcomeNode(false, Action.REJECT, consultedList);
+        actionNodes.add(noNode);
       }
     }
     return actionNodes;

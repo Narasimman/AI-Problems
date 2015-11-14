@@ -58,11 +58,11 @@ public class ChoiceNode implements INode {
       actionNode = new ChanceNode(0, INode.Action.PUBLISH, 
           this.getReviewerId(), consultedList);
     } else {
-      actionNode = new OutcomeNode(false, consultedList);
+      actionNode = new OutcomeNode(false, INode.Action.REJECT, consultedList);
     }
     actionNodes.add(actionNode);
 
-    for(Reviewer r : reviewers) {
+    for (Reviewer r : reviewers) {
       if(!consultedList.contains(r.getId())) {
         actionNode = new ChanceNode(0, INode.Action.CONSULT, r.getId(), consultedList);
         actionNodes.add(actionNode);
