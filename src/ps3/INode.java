@@ -19,4 +19,5 @@ public interface INode {
   public Type getType();
   public int getUtility();
   public List<Integer> getConsultedList();
+  public List<INode> getChildren(List<Reviewer> reviewers);
 }

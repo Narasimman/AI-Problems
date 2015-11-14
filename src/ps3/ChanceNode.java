@@ -16,7 +16,11 @@ public class ChanceNode implements INode {
     this.action = choice;
     this.reviewerId  = reviewer;
     this.consultedList.addAll(reviewerList);
-    this.consultedList.add(reviewer);
+    
+    if(choice == Action.CONSULT) {
+      this.consultedList.add(reviewer);
+    }
+
   }
 
   @Override
@@ -41,8 +45,38 @@ public class ChanceNode implements INode {
     return reviewerId;
   }
 
+  @Override
   public List<Integer> getConsultedList() {
     return consultedList;
   }
+  
+  @Override
+  public List<INode> getChildren(List<Reviewer> reviewers) {
+    List<Integer> consultedList;
+    
+    List<INode> actionNodes = new ArrayList<INode>();
+    consultedList = this.getConsultedList();
 
+    if(this.getAction() == Action.PUBLISH) {
+      INode successNode = new OutcomeNode(true, consultedList);
+      actionNodes.add(successNode);
+
+      INode failureNode = new OutcomeNode(false, consultedList);
+      actionNodes.add(failureNode);      
+    } else if(this.getAction() == Action.CONSULT) {
+      INode yesChoiceNode = new ChoiceNode(0, true, 
+          this.getReviewerId(), consultedList);
+      actionNodes.add(yesChoiceNode);
+
+      if(consultedList.size() == reviewers.size()) {
+        INode noChoiceNode = new ChoiceNode(0, true, 
+            this.getReviewerId(), consultedList);
+        actionNodes.add(noChoiceNode);
+      } else {
+        INode NoNode = new OutcomeNode(false, consultedList);
+        actionNodes.add(NoNode);
+      }
+    }
+    return actionNodes;
+  }
 }
