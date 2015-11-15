@@ -5,6 +5,7 @@ public class Reviewer {
   private int cost;
   private double p_s;
   private double p_f;
+  private boolean decision;
   private static int s_id = 0;
   
   Reviewer(int cost, double p_s, double p_f) {
@@ -17,6 +18,7 @@ public class Reviewer {
   public int getId() {
     return id;
   }
+  
   public int getCost() {
     return cost;
   }
@@ -27,5 +29,13 @@ public class Reviewer {
 
   public double getP_f() {
     return p_f;
+  }
+
+  void setDecision(boolean d) {
+    this.decision = d;
+  }
+  
+  public boolean getDecision() {
+    return decision;
   }
 }

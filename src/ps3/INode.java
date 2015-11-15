@@ -20,4 +20,6 @@ public interface INode {
   public int getUtility();
   public List<Integer> getConsultedList();
   public List<INode> getChildren(List<Reviewer> reviewers);
+  public void calculateUtility();
+  public double getProb();
 }

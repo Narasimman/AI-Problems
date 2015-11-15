@@ -9,12 +9,14 @@ public class OutcomeNode implements INode {
   private Action action;
   private boolean isSuccess;
   private List<Integer> consultedList = new ArrayList<Integer>();
+  private double prob;
 
-  OutcomeNode(boolean isSuccess, Action action, List<Integer> reviewerList) {
+  OutcomeNode(boolean isSuccess, Action action, List<Integer> reviewerList, double prob) {
     this.isSuccess = isSuccess;
     this.action = action;
     this.type = Type.OUTCOME;
     this.consultedList.addAll(reviewerList);
+    this.prob = prob;
   }
 
   @Override
@@ -25,6 +27,10 @@ public class OutcomeNode implements INode {
   @Override
   public int getUtility() {
     return utility;
+  }
+  
+  public double getProb() {
+    return prob;
   }
 
   public boolean isOutcomeNode() {
@@ -47,14 +53,18 @@ public class OutcomeNode implements INode {
 
     if(this.action != Action.REJECT) {
       if(this.isSuccess) {
-        p_util = MainDriver.util_s;
+        p_util = DecisionTree.util_s;
       } else {
-        p_util = MainDriver.util_f;
+        p_util = DecisionTree.util_f;
       }
     }
 
     this.utility = p_util - util;
-    System.out.println(this.utility);
+    //System.out.println(this.prob + "  " + this.utility);
     return new ArrayList<INode>();
+  }
+  
+  public void calculateUtility() {
+    //
   }
 }
