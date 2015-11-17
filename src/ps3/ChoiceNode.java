@@ -12,9 +12,9 @@ public class ChoiceNode implements INode {
   private double prob;
   private List<Boolean> chances = new ArrayList<Boolean>();
   private List<INode> children = new ArrayList<INode>();
+  private INode bestChild;
   
-  ChoiceNode(int util, boolean chance, int reviewer, List<Integer> reviewerList, double prob, List<Boolean> chanceList) {
-    this.utility = util;
+  ChoiceNode(boolean chance, int reviewer, List<Integer> reviewerList, double prob, List<Boolean> chanceList) {
     this.type = Type.CHOICE;
     this.chance = chance;
     this.reviewerId  = reviewer;
@@ -67,7 +67,7 @@ public class ChoiceNode implements INode {
 
     
     if(this.getChance()) {
-      actionNode = new ChanceNode(0, INode.Action.PUBLISH, this.getReviewerId(), consultedList, this.prob, this.chances);
+      actionNode = new ChanceNode(INode.Action.PUBLISH, this.getReviewerId(), consultedList, this.prob, this.chances);
     } else {
       actionNode = new OutcomeNode(false, INode.Action.REJECT, consultedList, this.prob);
     }
@@ -75,7 +75,7 @@ public class ChoiceNode implements INode {
 
     for (Reviewer r : reviewers) {
       if(!consultedList.contains(r.getId())) {
-        actionNode = new ChanceNode(0, INode.Action.CONSULT, r.getId(), consultedList, this.prob, this.chances);
+        actionNode = new ChanceNode(INode.Action.CONSULT, r.getId(), consultedList, this.prob, this.chances);
         actionNodes.add(actionNode);
       }
     }
@@ -85,13 +85,20 @@ public class ChoiceNode implements INode {
   
   public void calculateUtility() {
     int max_util = Integer.MIN_VALUE;
+    INode best = null;
     for (INode child : children) {
       if(child.getUtility() > max_util) {
         max_util = child.getUtility();
+        best = child;
       }
     }
+    this.bestChild = best;
     this.utility = max_util;
     //System.out.println(max_util);
+  }
+
+  public INode getBestChild() {
+    return bestChild;
   }
   
 }

@@ -1,7 +1,9 @@
 package ps3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChanceNode implements INode {
   private Type type;
@@ -13,8 +15,7 @@ public class ChanceNode implements INode {
   private List<Boolean> chances = new ArrayList<Boolean>();
   private List<INode> children = new ArrayList<INode>();
 
-  ChanceNode(int util, Action choice, int reviewer, List<Integer> reviewerList, double prob, List<Boolean> chanceList) {
-    this.utility = util;
+  ChanceNode(Action choice, int reviewer, List<Integer> reviewerList, double prob, List<Boolean> chanceList) {
     this.type = Type.CHANCE;
     this.action = choice;
     this.reviewerId  = reviewer;
@@ -23,7 +24,7 @@ public class ChanceNode implements INode {
     chances.addAll(chanceList);
     if(choice == Action.CONSULT) {
       this.consultedList.add(reviewer);
-      
+
     }
   }
 
@@ -57,37 +58,36 @@ public class ChanceNode implements INode {
   public double getProb() {
     return prob;
   }
-  
+
   private double getProbabilityForOutcomeNode(List<Reviewer> reviewers) {
     double prob = 0.0;
-    double s = 1.0, f = 1.0;
+    double p_success = 1.0, p_failure = 1.0;
 
-    int i =0;
-      for(int rId : consultedList) {
-        Reviewer r = reviewers.get(rId);
-        if(chances.get(i)) {
-        s *= r.getP_s();
-        f *= r.getP_f();
-        } else {
-          s *= 1 - r.getP_s();
-          f *= 1 - r.getP_f();
-        }
-        i++;
-      
+    int i = 0;
+    for(int rId : consultedList) {
+      Reviewer r = reviewers.get(rId);
+      if(chances.get(i)) {
+        p_success *= r.getP_s();
+        p_failure *= r.getP_f();
+      } else {
+        p_success *= 1 - r.getP_s();
+        p_failure *= 1 - r.getP_f();
+      }
+      i++;
     }
 
-    s *= DecisionTree.p_s;
-    f *= (1 - DecisionTree.p_s);
+    p_success *= DecisionTree.p_s;
+    p_failure *= (1 - DecisionTree.p_s);
 
-    prob = s/(s+f);
+    prob = p_success/(p_success + p_failure);
 
     return prob;
   }
 
-  private double getProbability(List<Reviewer> reviewers) {
+  private double getProbabilityForChoiceNode(List<Reviewer> reviewers) {
     double prob = 0.0;
-    double prob_r_s = 0.0;
-    double prob_r_f = 0.0;
+    double prob_r_s = 1.0;
+    double prob_r_f = 1.0;
 
     Reviewer currentReviewer = null;
     if(reviewerId >= 0) {
@@ -100,30 +100,24 @@ public class ChanceNode implements INode {
         for(int rId : consultedList) {
           if(rId != currentReviewer.getId()){
             if(chances.get(i)) {
-            prob_r_s = reviewers.get(rId).getP_s();
-            prob_r_f = reviewers.get(rId).getP_f();
+              prob_r_s = reviewers.get(rId).getP_s();
+              prob_r_f = reviewers.get(rId).getP_f();
             } else {
               prob_r_s = 1 - reviewers.get(rId).getP_s();
               prob_r_f = 1 - reviewers.get(rId).getP_f();
             }
-            
-          i++;  
+            i++;  
           }
-          
         }
-      } else {
-        prob_r_s = 1.0;
-        prob_r_f = 1.0;
       }
 
-      //System.out.println("Rev : " + reviewerId + "   " + prob_r_s + " " + currentReviewer.getP_s() + " " + this.prob);
       if(this.action == Action.PUBLISH) {
         prob = currentReviewer.getP_s() * DecisionTree.p_s / this.prob;
       } else {
         prob = ((prob_r_s * currentReviewer.getP_s() * DecisionTree.p_s) + 
             (prob_r_f * currentReviewer.getP_f() * (1 - DecisionTree.p_s))) / this.prob;
-      
-        
+
+
       }
     } else {      
       prob = DecisionTree.p_s;
@@ -148,13 +142,13 @@ public class ChanceNode implements INode {
       INode failureNode = new OutcomeNode(false, this.getAction(), consultedList, 1- prob);
       actionNodes.add(failureNode);
     } else if(this.getAction() == Action.CONSULT) {
-      double prob = this.getProbability(reviewers);
-      INode yesChoiceNode = new ChoiceNode(0, true, 
-          this.getReviewerId(), consultedList, prob, this.chances);
+      
+      double prob = this.getProbabilityForChoiceNode(reviewers);
+      INode yesChoiceNode = new ChoiceNode(true, this.getReviewerId(), consultedList, prob, this.chances);
       actionNodes.add(yesChoiceNode);
 
       if(consultedList.size() < reviewers.size()) {
-        INode noChoiceNode = new ChoiceNode(0, false,
+        INode noChoiceNode = new ChoiceNode(false,
             this.getReviewerId(), consultedList, 1 - prob, this.chances);
         actionNodes.add(noChoiceNode);
       } else {
@@ -166,11 +160,22 @@ public class ChanceNode implements INode {
     children = actionNodes;
     return actionNodes;
   }
-  
+
   public void calculateUtility() {
     double util = 0.0;
     for (INode child : children) {
       util += (child.getUtility() * child.getProb());
+      
+      if(child instanceof ChoiceNode) {
+        ChoiceNode node = (ChoiceNode) child;
+        Map<Integer, INode> bestChoice = new HashMap<Integer, INode>();
+        if (node.getChance()) {
+          bestChoice.put(1, node.getBestChild());
+        } else {
+          bestChoice.put(0, node.getBestChild());
+        }
+        DecisionTree.reviewerDecisions.put(node.getReviewerId(), bestChoice);
+      }
     }
     this.utility = (int) util;
     //System.out.println(util);
