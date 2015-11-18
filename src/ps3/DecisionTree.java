@@ -19,7 +19,6 @@ public class DecisionTree {
   private DirectedGraph<INode, DefaultEdge> tree =
       new DefaultDirectedGraph<INode, DefaultEdge>(DefaultEdge.class);
 
-
   DecisionTree(int util_s, int util_f, double p_s, List<Reviewer> reviewers) {
     DecisionTree.SUCCESS_UTIL = util_s;
     DecisionTree.FAILURE_UTIL = util_f;
@@ -27,12 +26,8 @@ public class DecisionTree {
     this.reviewers = reviewers;
   }
 
-  void initiateDecisionTree() {
-    List<Integer> reviewerList = new ArrayList<Integer>();
-    ChoiceNode root = new ChoiceNode(true, -1, reviewerList, 1, new ArrayList<Boolean>());
-    recursiveDecisionTree(root);
-    root.calculateUtility();
-    System.out.println("Expected Utility" + root.getUtility());
+  private void predictDecision(ChoiceNode root) {
+    System.out.println("Expected Utility: " + root.getUtility());
 
     Scanner scanner = new Scanner(System.in);
     boolean response = false;
@@ -79,6 +74,16 @@ public class DecisionTree {
       }
     }
     scanner.close();
+  }
+
+  void initiateDecisionTree() {
+    List<Integer> reviewerList = new ArrayList<Integer>();
+    ChoiceNode root = new ChoiceNode(true, -1, reviewerList, 1, new ArrayList<Boolean>());
+    recursiveDecisionTree(root);
+    root.calculateUtility();
+    
+    //call the predictor
+    predictDecision(root);
   }
 
   private void recursiveDecisionTree(INode node) {
