@@ -25,16 +25,6 @@ public class ChoiceNode implements INode {
       this.chances.add(chance);
   }
 
-  @Override
-  public Type getType() {
-    return type;
-  }
-
-  @Override
-  public int getUtility() {
-    return utility;
-  }
-  
   public boolean isChoiceNode() {
     return this.type == Type.CHOICE;
   }
@@ -46,7 +36,18 @@ public class ChoiceNode implements INode {
   public int getReviewerId() {
     return reviewerId;
   }
-  
+
+  @Override
+  public Type getType() {
+    return type;
+  }
+
+  @Override
+  public int getUtility() {
+    return utility;
+  }
+
+  @Override
   public double getProb() {
     return prob;
   }
@@ -83,6 +84,7 @@ public class ChoiceNode implements INode {
     return actionNodes;
   }
   
+  @Override
   public void calculateUtility() {
     int max_util = Integer.MIN_VALUE;
     INode best = null;
@@ -94,7 +96,6 @@ public class ChoiceNode implements INode {
     }
     this.bestChild = best;
     this.utility = max_util;
-    //System.out.println(max_util);
   }
 
   public INode getBestChild() {

@@ -30,11 +30,6 @@ public class MainDriver {
       System.out.println("File not found exception");
     }
   }
-  
-  //FIXME:
-  public DecisionTree getTree() {
-    return tree;
-  }
 
   public static void main(String[] args) {
     if (args.length < 1) {

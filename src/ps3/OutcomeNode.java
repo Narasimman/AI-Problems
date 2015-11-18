@@ -32,6 +32,10 @@ public class OutcomeNode implements INode {
   public double getProb() {
     return prob;
   }
+  
+  public Action getAction() {
+    return action;
+  }
 
   public boolean isOutcomeNode() {
     return this.type == Type.OUTCOME;
@@ -53,14 +57,13 @@ public class OutcomeNode implements INode {
 
     if(this.action != Action.REJECT) {
       if(this.isSuccess) {
-        p_util = DecisionTree.util_s;
+        p_util = DecisionTree.SUCCESS_UTIL;
       } else {
-        p_util = DecisionTree.util_f;
+        p_util = DecisionTree.FAILURE_UTIL;
       }
     }
 
     this.utility = p_util - util;
-    //System.out.println(this.prob + "  " + this.utility);
     return new ArrayList<INode>();
   }
   

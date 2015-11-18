@@ -1,9 +1,7 @@
 package ps3;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ChanceNode implements INode {
   private Type type;
@@ -15,7 +13,8 @@ public class ChanceNode implements INode {
   private List<Boolean> chances = new ArrayList<Boolean>();
   private List<INode> children = new ArrayList<INode>();
 
-  ChanceNode(Action choice, int reviewer, List<Integer> reviewerList, double prob, List<Boolean> chanceList) {
+  ChanceNode(Action choice, int reviewer, List<Integer> reviewerList,
+      double prob, List<Boolean> chanceList) {
     this.type = Type.CHANCE;
     this.action = choice;
     this.reviewerId  = reviewer;
@@ -26,16 +25,6 @@ public class ChanceNode implements INode {
       this.consultedList.add(reviewer);
 
     }
-  }
-
-  @Override
-  public Type getType() {
-    return type;
-  }
-
-  @Override
-  public int getUtility() {
-    return utility;
   }
 
   public boolean isChanceNode() {
@@ -50,6 +39,16 @@ public class ChanceNode implements INode {
     return reviewerId;
   }
 
+  @Override
+  public Type getType() {
+    return type;
+  }
+
+  @Override
+  public int getUtility() {
+    return utility;
+  }
+  
   @Override
   public List<Integer> getConsultedList() {
     return consultedList;
@@ -76,8 +75,8 @@ public class ChanceNode implements INode {
       i++;
     }
 
-    p_success *= DecisionTree.p_s;
-    p_failure *= (1 - DecisionTree.p_s);
+    p_success *= DecisionTree.PROB_SUCCESS;
+    p_failure *= (1 - DecisionTree.PROB_SUCCESS);
 
     prob = p_success/(p_success + p_failure);
 
@@ -112,15 +111,15 @@ public class ChanceNode implements INode {
       }
 
       if(this.action == Action.PUBLISH) {
-        prob = currentReviewer.getP_s() * DecisionTree.p_s / this.prob;
+        prob = currentReviewer.getP_s() * DecisionTree.PROB_SUCCESS / this.prob;
       } else {
-        prob = ((prob_r_s * currentReviewer.getP_s() * DecisionTree.p_s) + 
-            (prob_r_f * currentReviewer.getP_f() * (1 - DecisionTree.p_s))) / this.prob;
+        prob = ((prob_r_s * currentReviewer.getP_s() * DecisionTree.PROB_SUCCESS) + 
+            (prob_r_f * currentReviewer.getP_f() * (1 - DecisionTree.PROB_SUCCESS))) / this.prob;
 
 
       }
     } else {      
-      prob = DecisionTree.p_s;
+      prob = DecisionTree.PROB_SUCCESS;
     }
     //System.out.println("Prob " + prob);
     return prob;
@@ -161,21 +160,11 @@ public class ChanceNode implements INode {
     return actionNodes;
   }
 
+  @Override
   public void calculateUtility() {
     double util = 0.0;
     for (INode child : children) {
       util += (child.getUtility() * child.getProb());
-      
-      if(child instanceof ChoiceNode) {
-        ChoiceNode node = (ChoiceNode) child;
-        Map<Integer, INode> bestChoice = new HashMap<Integer, INode>();
-        if (node.getChance()) {
-          bestChoice.put(1, node.getBestChild());
-        } else {
-          bestChoice.put(0, node.getBestChild());
-        }
-        DecisionTree.reviewerDecisions.put(node.getReviewerId(), bestChoice);
-      }
     }
     this.utility = (int) util;
     //System.out.println(util);
