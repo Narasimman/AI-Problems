@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChoiceNode implements INode {
-  private Type type;
+  private final Type type;
+  private final boolean chance;
+  private final int reviewerId;
+  private final List<Integer> consultedList = new ArrayList<Integer>();
+  private final double prob;
+  private final List<Boolean> chances = new ArrayList<Boolean>();
+  
+  // Non final fields populated during backtracking
   private int utility;
-  private boolean chance;
-  private int reviewerId;
-  private List<Integer> consultedList = new ArrayList<Integer>();
-  private double prob;
-  private List<Boolean> chances = new ArrayList<Boolean>();
   private List<INode> children = new ArrayList<INode>();
   private INode bestChild;
   

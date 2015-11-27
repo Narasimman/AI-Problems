@@ -4,26 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChanceNode implements INode {
-  private Type type;
-  private int utility;
-  private Action action;
-  private int reviewerId;
-  private List<Integer> consultedList = new ArrayList<Integer>();
-  private double prob;
-  private List<Boolean> chances = new ArrayList<Boolean>();
+  private final Type type;
+  private final Action action;
+  private final int reviewerId;
+  private final List<Integer> consultedList = new ArrayList<Integer>();
+  private final double prob;
+  private final List<Boolean> chances = new ArrayList<Boolean>();
+  
+  //Non final fields populated during backtracking
   private List<INode> children = new ArrayList<INode>();
-
-  ChanceNode(Action choice, int reviewer, List<Integer> reviewerList,
+  private int utility;
+  
+  ChanceNode(Action action, int reviewer, List<Integer> reviewerList,
       double prob, List<Boolean> chanceList) {
     this.type = Type.CHANCE;
-    this.action = choice;
+    this.action = action;
     this.reviewerId  = reviewer;
     this.consultedList.addAll(reviewerList);
     this.prob = prob;
     chances.addAll(chanceList);
-    if(choice == Action.CONSULT) {
+    if(action == Action.CONSULT) {
       this.consultedList.add(reviewer);
-
     }
   }
 
@@ -121,16 +122,13 @@ public class ChanceNode implements INode {
     } else {      
       prob = DecisionTree.PROB_SUCCESS;
     }
-    //System.out.println("Prob " + prob);
     return prob;
   }
 
   @Override
   public List<INode> getChildren(List<Reviewer> reviewers) {
-    List<Integer> consultedList;
-
     List<INode> actionNodes = new ArrayList<INode>();
-    consultedList = this.getConsultedList();
+    List<Integer> consultedList = this.getConsultedList();
 
     if(this.getAction() == Action.PUBLISH) {
       double prob = this.getProbabilityForOutcomeNode(reviewers);
