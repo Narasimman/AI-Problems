@@ -52,7 +52,7 @@ def parse_input(N):
     words_in_list = []
     for biotext in texts.values():
       index +=1
-         
+ 
       if (word in biotext):
         words_in_list.append(index)
         try:
@@ -73,7 +73,6 @@ def parse_input(N):
   words_weight = {}
   for word in words_reg:
     words_weight[word] = -(math.log(float(words_reg[word])/float(text_length), 2))
-    
 
   f = open('potter_input','w')
   for k in words_weight.keys():
