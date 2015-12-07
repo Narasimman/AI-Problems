@@ -7,11 +7,12 @@ def parse_input(N):
   stopwordsinput = open("stopwords.txt")
   stopwords = stopwordsinput.read()
 
-  wordsList = []
+  wordsList = {}
   texts = {}
   blank = True
   bio = ""
-
+  index_to_author = {}
+  index = 0
   #FIX ME: reads the input file and creates a map of author=>bio
   for str in input.readlines():
     str = str.strip()
@@ -19,6 +20,8 @@ def parse_input(N):
       str = str.lower()
       if blank:
         author = str
+        index_to_author[index] = author
+        index +=1
         blank = False
       else:
         bio += str + " "
@@ -31,59 +34,71 @@ def parse_input(N):
   texts[author] = bio
 
   #read the words into a list
-  for str in texts.values():
-    words = re.sub("[^\w]", " ",  str.lower()).split()
-    wordsList.extend(words)
 
-  words = set()
+  for key in texts:
+    words = re.sub("[^\w]", " ",  texts[key].lower()).split()
+    wordsList[key] = words
+
 
   #discard all stop words and any word with length > 2    
-  for word in wordsList:
-    if (word not in stopwords):
-      if(len(word) > 2):
-        words.add(word)
+  for key in wordsList:
+    words = set()
+    for word in wordsList[key]:
+      if (word not in stopwords):
+        if(len(word) > 2):
+          words.add(word)
+    wordsList[key] = words
 
   #get the count of each word
   words_reg = {}
-  words_to_text = {}
-  words_in_list = []
-  for word in words:
-    index = 0
-    words_in_list = []
-    for biotext in texts.values():
-      index +=1
- 
-      if (word in biotext):
-        words_in_list.append(index)
-        try:
-          words_reg[word] += 1
-        except:
-          words_reg[word] = 1
-    #get the list in word in a map
-    words_to_text[word] = words_in_list
+  for key in wordsList:
+    for word in wordsList[key]:
+      try:
+        words_reg[word] += 1
+      except:
+        words_reg[word] = 1
 
   text_length = len(texts)
 
   #discard all words that occur more than half the texts
+  words_to_remove = []
   for k in words_reg.keys():
     if words_reg[k] > text_length/2:
-      words_reg.remove(k)
+      words_to_remove.append(k)
   
+  for key in wordsList:
+    words = set()
+    for word in wordsList[key]:
+      if word not in words_to_remove:
+        words.add(word)
+    wordsList[key] = words
+
   #Calculate the weight
   words_weight = {}
   for word in words_reg:
     words_weight[word] = -(math.log(float(words_reg[word])/float(text_length), 2))
 
+
+  for i in range(text_length):
+    for j in range(i):
+     set1 = wordsList[index_to_author[i]]
+     set2 = wordsList[index_to_author[j]]
+
+     common = set1&set2
+     if i == 20 and j == 19:
+       print common
+
+
+
   f = open('potter_input','w')
-  for k in words_weight.keys():
+  for k in wordsList:
     f.write(k + " ") # python will convert \n to os.linesep
-    #print "%s: %f" % (k, words_weight[k])
+    #print k, wordsList[k]
   f.close() # you can omit in most cases as the destructor will call it
-        
+
 if __name__ == "__main__":
   if len(sys.argv) < 2:
     sys.exit(-1)
   N = sys.argv[1]
-  print N
   parse_input(N)
 
